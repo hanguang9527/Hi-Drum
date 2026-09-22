@@ -1,0 +1,45 @@
+﻿# Site settings
+title: "Hi-Drum Demo"
+email: ""
+email2: ""
+description: > # this means to ignore newlines until "baseurl:"
+  Hi-Drum project demo website
+
+baseurl: "/Hi-Drum"
+url: "https://hanguang9527.github.io"
+
+# Social media
+twitter_username: ""
+github_username: "hanguang9527"
+cv_username: ""
+phone: ""
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+permalink: pretty
+
+# GitHub Pages specific
+repository: hanguang9527/Hi-Drum
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - README.md
+  - LICENCE
+
+# Collections
+collections:
+  posts:
+    output: true
+    permalink: /:year/:month/:day/:title/

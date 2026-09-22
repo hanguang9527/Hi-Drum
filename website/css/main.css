@@ -1,0 +1,94 @@
+/* Custom Navbar Styles */
+body {
+    padding-top: 80px;
+    /* Ensure content is not hidden behind fixed navbar */
+}
+
+#mainNav {
+    background-color: #fff;
+    box-shadow: none;
+    /* Explicitly remove shadow */
+    border-bottom: 1px solid #eee;
+    transition: all 0.35s;
+    font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+}
+
+#mainNav .navbar-header .navbar-toggle {
+    background-color: #222;
+    border-radius: 0;
+}
+
+#mainNav .nav>li>a {
+    font-size: 16px;
+    /* Increased font size */
+    font-weight: 600;
+    color: #222;
+    padding: 15px 20px;
+    letter-spacing: 0.5px;
+}
+
+#mainNav .nav>li>a:hover,
+#mainNav .nav>li>a:focus {
+    color: #ed6502;
+    /* Primary color */
+    background-color: transparent !important;
+}
+
+#mainNav .nav>li.active>a,
+#mainNav .nav>li.active>a:focus,
+#mainNav .nav>li.active>a:hover {
+    color: #ed6502 !important;
+    background-color: transparent !important;
+}
+
+#mainNav .navbar-toggle .icon-bar {
+    background-color: #fff;
+}
+
+/* Adjust navbar height and vertical alignment for desktop */
+@media (min-width: 768px) {
+    #mainNav {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        min-height: 80px;
+        /* Taller navbar */
+        border: none;
+    }
+
+    #mainNav .navbar-header {
+        /* Since we removed the brand, we don't need much here, but keeping it for the toggle button on mobile */
+    }
+
+    #mainNav .nav>li>a {
+        padding-top: 30px;
+        /* Vertically center text in taller navbar */
+        padding-bottom: 30px;
+    }
+
+    /* Override the flex style in index.html if needed, or work with it */
+    #mainNav .navbar-collapse {
+        /* Center the nav items if possible, or keep them distributed */
+        display: flex;
+        justify-content: center;
+    }
+
+    #mainNav .nav.navbar-nav {
+        /* Ensure the flexbox from inline style works well with our padding */
+        align-items: center;
+    }
+}
+
+/* Section padding */
+section {
+    padding: 50px 0;
+}
+
+.text-primary {
+    color: #ed6502;
+}
+
+hr.primary {
+    border-color: #ed6502;
+    border-width: 3px;
+    max-width: 50px;
+}
