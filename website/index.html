@@ -10,6 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Sora:wght@400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/hidrum.css">
+  <script type="module">
+    import "https://cdn.jsdelivr.net/npm/wave-roll@0.4.0/dist/wave-roll.es.js";
+  </script>
 </head>
 <body>
   <header class="site-header">
@@ -69,7 +72,8 @@
       <h2>Compare Ground Truth, Hi-Drum, and OaF Drums</h2>
       <div class="prose">
         <p>
-          Switch tabs to inspect piano-roll transcriptions and play aligned audio. Cases span jazz and gospel grooves at 120 BPM.
+          Each case overlays three piano rolls in one WaveRoll player (same engine as WaveRoll Studio).
+          Toggle track visibility, zoom/pan the roll, and play with synchronized reference audio.
         </p>
       </div>
 
@@ -81,47 +85,17 @@
             <li>120 BPM</li>
           </ul>
         </div>
-        <div class="tabs">
-          <div class="tabby-tab">
-            <input type="radio" id="tab-1-1" name="tab-1" checked>
-            <label for="tab-1-1">Ground Truth</label>
-            <div class="tabby-content">
-              <midi-visualizer src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.mid" id="demo_1_gt-visualizer"></midi-visualizer>
-              <midi-player src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.mid" visualizer="#demo_1_gt-visualizer" id="demo_1_gt-player"></midi-player>
-              <audio id="demo_1_gt-audio">
-                <source src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.mp3" type="audio/mpeg">
-                <source src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.wav" type="audio/wav">
-                <source src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.flac" type="audio/flac">
-              </audio>
-            </div>
-          </div>
-          <div class="tabby-tab">
-            <input type="radio" id="tab-1-2" name="tab-1">
-            <label for="tab-1-2">Hi-Drum</label>
-            <div class="tabby-content">
-              <midi-visualizer src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.mid" id="demo_1_hidrum-visualizer"></midi-visualizer>
-              <midi-player src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.mid" visualizer="#demo_1_hidrum-visualizer" id="demo_1_hidrum-player"></midi-player>
-              <audio id="demo_1_hidrum-audio">
-                <source src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.mp3" type="audio/mpeg">
-                <source src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.wav" type="audio/wav">
-                <source src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.flac" type="audio/flac">
-              </audio>
-            </div>
-          </div>
-          <div class="tabby-tab">
-            <input type="radio" id="tab-1-3" name="tab-1">
-            <label for="tab-1-3">OaF Drums</label>
-            <div class="tabby-content">
-              <midi-visualizer src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.mid" id="demo_1_oaf-visualizer"></midi-visualizer>
-              <midi-player src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.mid" visualizer="#demo_1_oaf-visualizer" id="demo_1_oaf-player"></midi-player>
-              <audio id="demo_1_oaf-audio">
-                <source src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.mp3" type="audio/mpeg">
-                <source src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.wav" type="audio/wav">
-                <source src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.flac" type="audio/flac">
-              </audio>
-            </div>
-          </div>
+        <div class="player-shell">
+          <wave-roll
+            readonly
+            files='[
+              {"path":"demo/15_jazz_120_beat_4-4_11/Ground_Truth.wav","name":"Reference Audio","type":"audio"},
+              {"path":"demo/15_jazz_120_beat_4-4_11/Ground_Truth.mid","name":"Ground Truth","type":"midi","color":"#2a6f97"},
+              {"path":"demo/15_jazz_120_beat_4-4_11/Hi-Drum.mid","name":"Hi-Drum","type":"midi","color":"#0f6e56"},
+              {"path":"demo/15_jazz_120_beat_4-4_11/OaF_Drums.mid","name":"OaF Drums","type":"midi","color":"#c45c26"}
+            ]'></wave-roll>
         </div>
+        <p class="case-hint">Green = Hi-Drum · Blue = Ground Truth · Orange = OaF Drums</p>
       </article>
 
       <article class="case">
@@ -132,47 +106,17 @@
             <li>120 BPM</li>
           </ul>
         </div>
-        <div class="tabs">
-          <div class="tabby-tab">
-            <input type="radio" id="tab-2-1" name="tab-2" checked>
-            <label for="tab-2-1">Ground Truth</label>
-            <div class="tabby-content">
-              <midi-visualizer src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.mid" id="demo_2_gt-visualizer"></midi-visualizer>
-              <midi-player src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.mid" visualizer="#demo_2_gt-visualizer" id="demo_2_gt-player"></midi-player>
-              <audio id="demo_2_gt-audio">
-                <source src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.mp3" type="audio/mpeg">
-                <source src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.wav" type="audio/wav">
-                <source src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.flac" type="audio/flac">
-              </audio>
-            </div>
-          </div>
-          <div class="tabby-tab">
-            <input type="radio" id="tab-2-2" name="tab-2">
-            <label for="tab-2-2">Hi-Drum</label>
-            <div class="tabby-content">
-              <midi-visualizer src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.mid" id="demo_2_hidrum-visualizer"></midi-visualizer>
-              <midi-player src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.mid" visualizer="#demo_2_hidrum-visualizer" id="demo_2_hidrum-player"></midi-player>
-              <audio id="demo_2_hidrum-audio">
-                <source src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.mp3" type="audio/mpeg">
-                <source src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.wav" type="audio/wav">
-                <source src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.flac" type="audio/flac">
-              </audio>
-            </div>
-          </div>
-          <div class="tabby-tab">
-            <input type="radio" id="tab-2-3" name="tab-2">
-            <label for="tab-2-3">OaF Drums</label>
-            <div class="tabby-content">
-              <midi-visualizer src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.mid" id="demo_2_oaf-visualizer"></midi-visualizer>
-              <midi-player src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.mid" visualizer="#demo_2_oaf-visualizer" id="demo_2_oaf-player"></midi-player>
-              <audio id="demo_2_oaf-audio">
-                <source src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.mp3" type="audio/mpeg">
-                <source src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.wav" type="audio/wav">
-                <source src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.flac" type="audio/flac">
-              </audio>
-            </div>
-          </div>
+        <div class="player-shell">
+          <wave-roll
+            readonly
+            files='[
+              {"path":"demo/39_jazz_120_beat_4-4_13/Ground_Truth.wav","name":"Reference Audio","type":"audio"},
+              {"path":"demo/39_jazz_120_beat_4-4_13/Ground_Truth.mid","name":"Ground Truth","type":"midi","color":"#2a6f97"},
+              {"path":"demo/39_jazz_120_beat_4-4_13/Hi-Drum.mid","name":"Hi-Drum","type":"midi","color":"#0f6e56"},
+              {"path":"demo/39_jazz_120_beat_4-4_13/OaF_Drums.mid","name":"OaF Drums","type":"midi","color":"#c45c26"}
+            ]'></wave-roll>
         </div>
+        <p class="case-hint">Green = Hi-Drum · Blue = Ground Truth · Orange = OaF Drums</p>
       </article>
 
       <article class="case">
@@ -183,47 +127,17 @@
             <li>120 BPM</li>
           </ul>
         </div>
-        <div class="tabs">
-          <div class="tabby-tab">
-            <input type="radio" id="tab-3-1" name="tab-3" checked>
-            <label for="tab-3-1">Ground Truth</label>
-            <div class="tabby-content">
-              <midi-visualizer src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.mid" id="demo_3_gt-visualizer"></midi-visualizer>
-              <midi-player src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.mid" visualizer="#demo_3_gt-visualizer" id="demo_3_gt-player"></midi-player>
-              <audio id="demo_3_gt-audio">
-                <source src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.mp3" type="audio/mpeg">
-                <source src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.wav" type="audio/wav">
-                <source src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.flac" type="audio/flac">
-              </audio>
-            </div>
-          </div>
-          <div class="tabby-tab">
-            <input type="radio" id="tab-3-2" name="tab-3">
-            <label for="tab-3-2">Hi-Drum</label>
-            <div class="tabby-content">
-              <midi-visualizer src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.mid" id="demo_3_hidrum-visualizer"></midi-visualizer>
-              <midi-player src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.mid" visualizer="#demo_3_hidrum-visualizer" id="demo_3_hidrum-player"></midi-player>
-              <audio id="demo_3_hidrum-audio">
-                <source src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.mp3" type="audio/mpeg">
-                <source src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.wav" type="audio/wav">
-                <source src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.flac" type="audio/flac">
-              </audio>
-            </div>
-          </div>
-          <div class="tabby-tab">
-            <input type="radio" id="tab-3-3" name="tab-3">
-            <label for="tab-3-3">OaF Drums</label>
-            <div class="tabby-content">
-              <midi-visualizer src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.mid" id="demo_3_oaf-visualizer"></midi-visualizer>
-              <midi-player src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.mid" visualizer="#demo_3_oaf-visualizer" id="demo_3_oaf-player"></midi-player>
-              <audio id="demo_3_oaf-audio">
-                <source src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.mp3" type="audio/mpeg">
-                <source src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.wav" type="audio/wav">
-                <source src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.flac" type="audio/flac">
-              </audio>
-            </div>
-          </div>
+        <div class="player-shell">
+          <wave-roll
+            readonly
+            files='[
+              {"path":"demo/142_gospel_120_beat_4-4_36/Ground_Truth.wav","name":"Reference Audio","type":"audio"},
+              {"path":"demo/142_gospel_120_beat_4-4_36/Ground_Truth.mid","name":"Ground Truth","type":"midi","color":"#2a6f97"},
+              {"path":"demo/142_gospel_120_beat_4-4_36/Hi-Drum.mid","name":"Hi-Drum","type":"midi","color":"#0f6e56"},
+              {"path":"demo/142_gospel_120_beat_4-4_36/OaF_Drums.mid","name":"OaF Drums","type":"midi","color":"#c45c26"}
+            ]'></wave-roll>
         </div>
+        <p class="case-hint">Green = Hi-Drum · Blue = Ground Truth · Orange = OaF Drums</p>
       </article>
     </section>
   </main>
@@ -231,53 +145,15 @@
   <footer class="site-footer">
     <p>
       Built for the Hi-Drum project.
-      MIDI visualization via
-      <a href="https://cifkao.github.io/html-midi-player/" target="_blank" rel="noopener">html-midi-player</a>;
-      audio rendered with Kontakt Factory Library 2 / BandLab.
+      Piano-roll player powered by
+      <a href="https://github.com/crescent-stdio/wave-roll" target="_blank" rel="noopener">WaveRoll</a>
+      (same stack as WaveRoll Studio);
+      reference audio rendered with Kontakt Factory Library 2 / BandLab.
     </p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.4.0"></script>
   <script>
     (function () {
-      var visualizers = document.getElementsByTagName("midi-visualizer");
-      for (var i = 0; i < visualizers.length; i++) {
-        visualizers[i].config = {
-          noteHeight: 8,
-          pixelsPerTimeStep: 60,
-          minPitch: 35,
-          maxPitch: 60
-        };
-      }
-
-      function onDomReady() {
-        var players = document.getElementsByTagName("midi-player");
-        var audios = document.getElementsByTagName("audio");
-        for (var i = 0; i < players.length; i++) {
-          (function (player, audio) {
-            player.addEventListener("load", function () {
-              var SeekBar = player.shadowRoot && player.shadowRoot.querySelector(".seek-bar");
-              if (!SeekBar) return;
-              SeekBar.addEventListener("input", function () { audio.pause(); });
-              SeekBar.addEventListener("change", function () {
-                audio.currentTime = player.currentTime;
-                if (player.playing) {
-                  var playPromise = audio.play();
-                  if (playPromise) playPromise.catch(function () {});
-                }
-              });
-            });
-            player.addEventListener("start", function () {
-              audio.currentTime = player.currentTime;
-              var playPromise = audio.play();
-              if (playPromise) playPromise.catch(function () {});
-            });
-            player.addEventListener("stop", function () { audio.pause(); });
-          })(players[i], audios[i]);
-        }
-      }
-      document.addEventListener("DOMContentLoaded", onDomReady);
-
       if ("IntersectionObserver" in window) {
         var io = new IntersectionObserver(function (entries) {
           entries.forEach(function (entry) {
