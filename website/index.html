@@ -143,6 +143,82 @@
 
   <script>
     (function () {
+      var HIDE_TITLES = {
+        "Toggle A-B Loop Mode": 1,
+        "Clear A-B Loop": 1,
+        "Playback Tempo": 1,
+        "Decrease tempo": 1,
+        "Increase tempo": 1,
+        Settings: 1,
+        Appearance: 1
+      };
+
+      function hideEl(el) {
+        if (!el || el.dataset.hidrumHidden === "1") return;
+        el.dataset.hidrumHidden = "1";
+        el.style.setProperty("display", "none", "important");
+      }
+
+      function hideGroup(el) {
+        if (!el) return;
+        hideEl(el.parentElement || el);
+      }
+
+      function simplifyWaveRoll(wr) {
+        var root = wr.shadowRoot;
+        if (!root) return;
+
+        root.querySelectorAll("button[title], [title]").forEach(function (el) {
+          var title = el.getAttribute("title") || "";
+          if (!HIDE_TITLES[title]) return;
+          if (title === "Toggle A-B Loop Mode" || title === "Clear A-B Loop" || title === "Playback Tempo") {
+            hideGroup(el);
+          } else {
+            hideEl(el);
+          }
+        });
+
+        root.querySelectorAll("button").forEach(function (btn) {
+          var t = (btn.textContent || "").trim();
+          if (t === "A" || t === "B") hideEl(btn);
+        });
+
+        root.querySelectorAll("span, label, div").forEach(function (el) {
+          var t = (el.textContent || "").trim();
+          if (t === "Show notes:" || t.indexOf("Show notes:") === 0 && el.children.length <= 2) {
+            hideGroup(el);
+          }
+        });
+
+        // Hide leftover BPM badge / evaluation select if still visible
+        root.querySelectorAll("button, select").forEach(function (el) {
+          var t = (el.textContent || el.value || "").trim();
+          if (/\bBPM\b/.test(t)) hideGroup(el);
+          if (/True Positive|False Positive|False Negative|\(TP\)|\(FP\)|\(FN\)/.test(t)) hideGroup(el);
+        });
+      }
+
+      function watchWaveRoll(wr) {
+        var apply = function () { simplifyWaveRoll(wr); };
+        apply();
+        var tries = 0;
+        var timer = setInterval(function () {
+          apply();
+          tries += 1;
+          if (tries > 40) clearInterval(timer);
+        }, 250);
+
+        function bindObserver() {
+          if (!wr.shadowRoot || wr._hidrumObserved) return;
+          wr._hidrumObserved = true;
+          var mo = new MutationObserver(function () { apply(); });
+          mo.observe(wr.shadowRoot, { childList: true, subtree: true });
+        }
+        bindObserver();
+        setTimeout(bindObserver, 500);
+        setTimeout(bindObserver, 1500);
+      }
+
       function filesFor(demo, key, label, color) {
         var base = "demo/" + demo + "/" + key;
         return JSON.stringify([
@@ -169,9 +245,13 @@
           btn.classList.toggle("is-active", on);
           btn.setAttribute("aria-selected", on ? "true" : "false");
         });
+        setTimeout(function () { simplifyWaveRoll(wr); }, 50);
+        setTimeout(function () { simplifyWaveRoll(wr); }, 400);
       }
 
       document.querySelectorAll(".case").forEach(function (caseEl) {
+        var wr = caseEl.querySelector("wave-roll");
+        if (wr) watchWaveRoll(wr);
         var first = caseEl.querySelector(".case-tab.is-active") || caseEl.querySelector(".case-tab");
         if (first) applyTab(caseEl, first);
         caseEl.querySelectorAll(".case-tab").forEach(function (btn) {
