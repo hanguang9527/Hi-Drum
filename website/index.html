@@ -72,12 +72,11 @@
       <h2>Compare Ground Truth, Hi-Drum, and OaF Drums</h2>
       <div class="prose">
         <p>
-          Each case overlays three piano rolls in one WaveRoll player (same engine as WaveRoll Studio).
-          Toggle track visibility, zoom/pan the roll, and play with synchronized reference audio.
+          Switch tabs to view each transcription separately. The piano-roll player uses WaveRoll (same engine as WaveRoll Studio).
         </p>
       </div>
 
-      <article class="case">
+      <article class="case" data-demo="15_jazz_120_beat_4-4_11">
         <div class="case-head">
           <h3 class="case-id">Demo 01</h3>
           <ul class="case-meta">
@@ -85,20 +84,17 @@
             <li>120 BPM</li>
           </ul>
         </div>
-        <div class="player-shell">
-          <wave-roll
-            readonly
-            files='[
-              {"path":"demo/15_jazz_120_beat_4-4_11/Ground_Truth.wav","name":"Reference Audio","type":"audio"},
-              {"path":"demo/15_jazz_120_beat_4-4_11/Ground_Truth.mid","name":"Ground Truth","type":"midi","color":"#2a6f97"},
-              {"path":"demo/15_jazz_120_beat_4-4_11/Hi-Drum.mid","name":"Hi-Drum","type":"midi","color":"#0f6e56"},
-              {"path":"demo/15_jazz_120_beat_4-4_11/OaF_Drums.mid","name":"OaF Drums","type":"midi","color":"#c45c26"}
-            ]'></wave-roll>
+        <div class="case-tabs" role="tablist">
+          <button type="button" class="case-tab is-active" role="tab" aria-selected="true" data-key="Ground_Truth" data-label="Ground Truth" data-color="#2a6f97">Ground Truth</button>
+          <button type="button" class="case-tab" role="tab" aria-selected="false" data-key="Hi-Drum" data-label="Hi-Drum" data-color="#0f6e56">Hi-Drum</button>
+          <button type="button" class="case-tab" role="tab" aria-selected="false" data-key="OaF_Drums" data-label="OaF Drums" data-color="#c45c26">OaF Drums</button>
         </div>
-        <p class="case-hint">Green = Hi-Drum · Blue = Ground Truth · Orange = OaF Drums</p>
+        <div class="player-shell">
+          <wave-roll readonly></wave-roll>
+        </div>
       </article>
 
-      <article class="case">
+      <article class="case" data-demo="39_jazz_120_beat_4-4_13">
         <div class="case-head">
           <h3 class="case-id">Demo 02</h3>
           <ul class="case-meta">
@@ -106,20 +102,17 @@
             <li>120 BPM</li>
           </ul>
         </div>
-        <div class="player-shell">
-          <wave-roll
-            readonly
-            files='[
-              {"path":"demo/39_jazz_120_beat_4-4_13/Ground_Truth.wav","name":"Reference Audio","type":"audio"},
-              {"path":"demo/39_jazz_120_beat_4-4_13/Ground_Truth.mid","name":"Ground Truth","type":"midi","color":"#2a6f97"},
-              {"path":"demo/39_jazz_120_beat_4-4_13/Hi-Drum.mid","name":"Hi-Drum","type":"midi","color":"#0f6e56"},
-              {"path":"demo/39_jazz_120_beat_4-4_13/OaF_Drums.mid","name":"OaF Drums","type":"midi","color":"#c45c26"}
-            ]'></wave-roll>
+        <div class="case-tabs" role="tablist">
+          <button type="button" class="case-tab is-active" role="tab" aria-selected="true" data-key="Ground_Truth" data-label="Ground Truth" data-color="#2a6f97">Ground Truth</button>
+          <button type="button" class="case-tab" role="tab" aria-selected="false" data-key="Hi-Drum" data-label="Hi-Drum" data-color="#0f6e56">Hi-Drum</button>
+          <button type="button" class="case-tab" role="tab" aria-selected="false" data-key="OaF_Drums" data-label="OaF Drums" data-color="#c45c26">OaF Drums</button>
         </div>
-        <p class="case-hint">Green = Hi-Drum · Blue = Ground Truth · Orange = OaF Drums</p>
+        <div class="player-shell">
+          <wave-roll readonly></wave-roll>
+        </div>
       </article>
 
-      <article class="case">
+      <article class="case" data-demo="142_gospel_120_beat_4-4_36">
         <div class="case-head">
           <h3 class="case-id">Demo 03</h3>
           <ul class="case-meta">
@@ -127,17 +120,14 @@
             <li>120 BPM</li>
           </ul>
         </div>
-        <div class="player-shell">
-          <wave-roll
-            readonly
-            files='[
-              {"path":"demo/142_gospel_120_beat_4-4_36/Ground_Truth.wav","name":"Reference Audio","type":"audio"},
-              {"path":"demo/142_gospel_120_beat_4-4_36/Ground_Truth.mid","name":"Ground Truth","type":"midi","color":"#2a6f97"},
-              {"path":"demo/142_gospel_120_beat_4-4_36/Hi-Drum.mid","name":"Hi-Drum","type":"midi","color":"#0f6e56"},
-              {"path":"demo/142_gospel_120_beat_4-4_36/OaF_Drums.mid","name":"OaF Drums","type":"midi","color":"#c45c26"}
-            ]'></wave-roll>
+        <div class="case-tabs" role="tablist">
+          <button type="button" class="case-tab is-active" role="tab" aria-selected="true" data-key="Ground_Truth" data-label="Ground Truth" data-color="#2a6f97">Ground Truth</button>
+          <button type="button" class="case-tab" role="tab" aria-selected="false" data-key="Hi-Drum" data-label="Hi-Drum" data-color="#0f6e56">Hi-Drum</button>
+          <button type="button" class="case-tab" role="tab" aria-selected="false" data-key="OaF_Drums" data-label="OaF Drums" data-color="#c45c26">OaF Drums</button>
         </div>
-        <p class="case-hint">Green = Hi-Drum · Blue = Ground Truth · Orange = OaF Drums</p>
+        <div class="player-shell">
+          <wave-roll readonly></wave-roll>
+        </div>
       </article>
     </section>
   </main>
@@ -145,15 +135,52 @@
   <footer class="site-footer">
     <p>
       Built for the Hi-Drum project.
-      Piano-roll player powered by
-      <a href="https://github.com/crescent-stdio/wave-roll" target="_blank" rel="noopener">WaveRoll</a>
-      (same stack as WaveRoll Studio);
-      reference audio rendered with Kontakt Factory Library 2 / BandLab.
+      Piano-roll display powered by
+      <a href="https://github.com/crescent-stdio/wave-roll" target="_blank" rel="noopener">WaveRoll</a>;
+      audio rendered with Kontakt Factory Library 2 / BandLab.
     </p>
   </footer>
 
   <script>
     (function () {
+      function filesFor(demo, key, label, color) {
+        var base = "demo/" + demo + "/" + key;
+        return JSON.stringify([
+          { path: base + ".wav", name: "Audio", type: "audio" },
+          { path: base + ".mid", name: label, type: "midi", color: color }
+        ]);
+      }
+
+      function applyTab(caseEl, tabBtn) {
+        var demo = caseEl.getAttribute("data-demo");
+        var wr = caseEl.querySelector("wave-roll");
+        if (!wr || !demo) return;
+        wr.setAttribute(
+          "files",
+          filesFor(
+            demo,
+            tabBtn.getAttribute("data-key"),
+            tabBtn.getAttribute("data-label"),
+            tabBtn.getAttribute("data-color")
+          )
+        );
+        caseEl.querySelectorAll(".case-tab").forEach(function (btn) {
+          var on = btn === tabBtn;
+          btn.classList.toggle("is-active", on);
+          btn.setAttribute("aria-selected", on ? "true" : "false");
+        });
+      }
+
+      document.querySelectorAll(".case").forEach(function (caseEl) {
+        var first = caseEl.querySelector(".case-tab.is-active") || caseEl.querySelector(".case-tab");
+        if (first) applyTab(caseEl, first);
+        caseEl.querySelectorAll(".case-tab").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            applyTab(caseEl, btn);
+          });
+        });
+      });
+
       if ("IntersectionObserver" in window) {
         var io = new IntersectionObserver(function (entries) {
           entries.forEach(function (entry) {

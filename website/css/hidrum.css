@@ -310,26 +310,58 @@ a:hover {
   color: var(--ink-soft);
 }
 
+.case-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: rgba(255, 255, 255, 0.7);
+  overflow: hidden;
+}
+
+.case-tab {
+  appearance: none;
+  flex: 1 1 0;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  font-family: var(--font-ui);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0.75rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.case-tab:last-child {
+  border-right: 0;
+}
+
+.case-tab:hover {
+  color: var(--ink);
+  background: rgba(15, 110, 86, 0.05);
+}
+
+.case-tab.is-active {
+  color: var(--accent);
+  background: #ffffff;
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
 .player-shell {
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 0 0 var(--radius) var(--radius);
   overflow: hidden;
   background: #ffffff;
-  box-shadow: 0 10px 30px rgba(20, 24, 22, 0.06);
 }
 
 .player-shell wave-roll {
   display: block;
   width: 100%;
   height: clamp(420px, 58vh, 620px);
-  --wr-bg: #ffffff;
-}
-
-.case-hint {
-  margin: 0.65rem 0 0;
-  font-family: var(--font-ui);
-  font-size: 0.78rem;
-  color: var(--muted);
 }
 
 .site-footer {
