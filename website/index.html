@@ -198,8 +198,41 @@
         });
       }
 
+      function muteMidiSynthesis(wr) {
+        // Keep Kontakt/BandLab drum WAV audible; mute Tone.js MIDI synth.
+        // WaveRoll treats channel-10 drums as melodic GM (e.g. synth_drum) → piano-like tones.
+        try {
+          var player = wr.player;
+          var mm = player && player.midiManager;
+          if (!mm || typeof mm.getState !== "function") return false;
+          var files = (mm.getState().files || []);
+          var muted = 0;
+          files.forEach(function (f) {
+            if (!f || !f.id) return;
+            if (!f.isMuted && typeof mm.toggleMute === "function") {
+              mm.toggleMute(f.id);
+            } else {
+              f.isMuted = true;
+            }
+            try {
+              if (player.visualizationEngine && player.visualizationEngine.setFileMute) {
+                player.visualizationEngine.setFileMute(f.id, true);
+              }
+            } catch (e) {}
+            muted += 1;
+          });
+          return muted > 0;
+        } catch (e) {
+          console.warn("Hi-Drum: could not mute MIDI synth", e);
+          return false;
+        }
+      }
+
       function watchWaveRoll(wr) {
-        var apply = function () { simplifyWaveRoll(wr); };
+        var apply = function () {
+          simplifyWaveRoll(wr);
+          muteMidiSynthesis(wr);
+        };
         apply();
         var tries = 0;
         var timer = setInterval(function () {
@@ -207,6 +240,15 @@
           tries += 1;
           if (tries > 40) clearInterval(timer);
         }, 250);
+
+        if (!wr._hidrumLoadBound) {
+          wr._hidrumLoadBound = true;
+          wr.addEventListener("load", function () {
+            simplifyWaveRoll(wr);
+            muteMidiSynthesis(wr);
+            setTimeout(function () { muteMidiSynthesis(wr); }, 300);
+          });
+        }
 
         function bindObserver() {
           if (!wr.shadowRoot || wr._hidrumObserved) return;
@@ -222,7 +264,7 @@
       function filesFor(demo, key, label, color) {
         var base = "demo/" + demo + "/" + key;
         return JSON.stringify([
-          { path: base + ".wav", name: "Audio", type: "audio" },
+          { path: base + ".wav", name: "Drum Audio", type: "audio" },
           { path: base + ".mid", name: label, type: "midi", color: color }
         ]);
       }
@@ -245,8 +287,8 @@
           btn.classList.toggle("is-active", on);
           btn.setAttribute("aria-selected", on ? "true" : "false");
         });
-        setTimeout(function () { simplifyWaveRoll(wr); }, 50);
-        setTimeout(function () { simplifyWaveRoll(wr); }, 400);
+        setTimeout(function () { simplifyWaveRoll(wr); muteMidiSynthesis(wr); }, 50);
+        setTimeout(function () { simplifyWaveRoll(wr); muteMidiSynthesis(wr); }, 400);
       }
 
       document.querySelectorAll(".case").forEach(function (caseEl) {
