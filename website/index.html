@@ -1,587 +1,294 @@
+<!DOCTYPE html>
 <html lang="en">
-<style>
-  /* Custom player style */
-  midi-player {
-    display: block;
-    width: inherit;
-    height: 25px;
-    margin: 0 0px 0rem 0px;
-    margin-top: 0;
-  }
-
-  midi-player::part(control-panel) {
-    background: linear-gradient(#fefefe, #e9e9e9);
-    border: 1px solid #e9e9e9;
-    border-top: none;
-    border-radius: 0px 0px 10px 10px;
-  }
-
-  midi-visualizer .piano-roll-visualizer {
-    background: #fefefe;
-    border: 1px solid #e9e9e9;
-    border-bottom: none;
-    border-radius: 0px 0px 0 0;
-    margin: 0 0px;
-    margin-bottom: 0;
-    width: inherit;
-    overflow: auto;
-  }
-
-  midi-visualizer svg {
-    margin: 2px;
-  }
-
-  midi-visualizer svg rect.note {
-    opacity: calc(min(1, (var(--midi-velocity) + 30) / 128) * 0.75);
-  }
-
-  midi-visualizer svg rect.note.active {
-    opacity: calc(min(1, (var(--midi-velocity) + 30) / 128) * 0.9);
-    stroke: rgb(0, 0, 0);
-    stroke-width: 1;
-    stroke-opacity: 1;
-  }
-
-  midi-visualizer svg rect.note[data-program="0"] {
-    fill: #1f77b4;
-    opacity: 50%;
-  }
-
-  midi-visualizer svg rect.note[data-program="8"] {
-    fill: #2ca02c;
-    opacity: 50%;
-  }
-
-  midi-visualizer svg rect.note[data-program="16"] {
-    fill: #ffbb78;
-    opacity: 50%;
-  }
-
-  midi-visualizer svg rect.note[data-program="24"] {
-    fill: #07e1e9;
-    opacity: 20%;
-  }
-
-  midi-visualizer svg rect.note[data-program="32"] {
-    fill: #9467bd;
-    opacity: 50%;
-  }
-
-  midi-visualizer svg rect.note[data-program="40"] {
-    fill: #8c564b;
-    opacity: 50%;
-  }
-
-  midi-visualizer svg rect.note[data-program="48"] {
-    fill: #e377c2;
-    opacity: 50%;
-  }
-
-  midi-visualizer svg rect.note[data-program="56"] {
-    fill: #ff7f0e;
-    opacity: 50%;
-  }
-
-  midi-visualizer svg rect.note[data-program="64"] {
-    fill: #bcbd22;
-    opacity: 50%;
-  }
-
-  midi-visualizer svg rect.note[data-program="72"] {
-    fill: #17becf;
-    opacity: 50%;
-  }
-
-  midi-visualizer svg rect.note[data-program="80"] {
-    fill: #1b9e77;
-    opacity: 50%;
-  }
-
-  midi-visualizer svg rect.note[data-program="88"] {
-    fill: #d62728;
-  }
-
-  midi-visualizer svg rect.note[data-program="89"] {
-    fill: #98df8a;
-    opacity: 50%;
-  }
-
-
-
-
-  @import url(https://fonts.googleapis.com/css?family=Lato:400,700,900,300);
-
-  /* MAKE IT CUTE ----- */
-  .tabs {
-    position: relative;
-    display: flex;
-    min-height: 500px;
-    border-radius: 10px 10px 0px 0px;
-    overflow: hidden;
-  }
-
-  .tabby-tab {
-    width: 200px;
-  }
-
-  .tabby-tab label {
-    display: block;
-    box-sizing: border-box;
-    /* tab content must clear this */
-    height: 25px;
-
-    padding: 3px;
-    text-align: center;
-    background: #c4e7f0;
-    cursor: pointer;
-    border-radius: 10px 5px 10px 0px;
-  }
-
-  .tabby-tab label:hover {
-    background: #82bcce;
-  }
-
-  .tabby-content {
-    position: absolute;
-    left: 0px;
-    bottom: 0;
-    right: 0px;
-    /* clear the tab labels */
-    top: 25px;
-    padding: 0px;
-    border-radius: 0px 0px 0px 0px;
-    background: #ffffff;
-  }
-
-  /* MAKE IT WORK ----- */
-  .tabby-tab [type=radio] {
-    display: none;
-  }
-
-  [type=radio]:checked~label {
-    background: #3fb2d5;
-    z-index: 2;
-  }
-
-  [type=radio]:checked~label~.tabby-content {
-    z-index: 1;
-    /* show/hide */
-    opacity: 1;
-    transform: scale(1);
-  }
-</style>
-
 <head>
-
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="">
-  <meta name="author" content="">
-
-  <title>Hi-Drum Demo</title>
-
-  <!-- Bootstrap Core CSS -->
-  <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
-
-  <!-- Custom Fonts -->
-  <link
-    href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800'
-    rel='stylesheet' type='text/css'>
-  <link
-    href='https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic'
-    rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css" type="text/css">
-
-  <!-- Plugin CSS -->
-  <link rel="stylesheet" href="css/animate.min.css" type="text/css">
-
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="css/main.css" type="text/css">
-
-  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-  <style>
-    div.indent2 {
-      text-indent: -69px;
-      padding-left: 69px;
-    }
-  </style>
-
+  <meta name="description" content="Hi-Drum: hierarchical drum transcription with self-supervised music representations. ICASSP 2027 demo.">
+  <title>Hi-Drum · ICASSP 2027</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Sora:wght@400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/hidrum.css">
 </head>
-
-
-<body id="page-top">
-  <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-          data-target="#bs-example-navbar-collapse-1">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-      </div>
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav" style="display: flex; justify-content: center; width: 100%; float: none; gap: 40px;">
-          <li>
-            <a class="page-scroll" href="#abstract">Abstract</a>
-          </li>
-          <li>
-            <a class="page-scroll" href="#arr_demo">Case Study</a>
-          </li>
-        </ul>
-      </div>
-      <!-- /.navbar-collapse -->
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <a class="brand-mark" href="#top">Hi-Drum</a>
+      <ul class="nav-links">
+        <li><a href="#abstract">Abstract</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#cases">Case Study</a></li>
+      </ul>
     </div>
-    <!-- /.container-fluid -->
-  </nav>
+  </header>
 
-  <section class="bg-white">
-    <div class="container no-gutter small-padding" id="abstract">
-      <div class="col-lg-12 text-center">
-        <h2 class="section-heading">Hi-Drum: A Framework for Drum Transcription<br>Based on Self-Supervised Music
-          Representations</h2>
-        <hr class="primary">
-        <h4 class="section-heading">Authors: Weiyang Ding &middot; ICASSP 2027</h4>
-        <h3></h3>
+  <main id="top">
+    <section class="hero">
+      <p class="hero-kicker">ICASSP 2027</p>
+      <h1 class="hero-brand">Hi-Drum</h1>
+      <p class="hero-title">A framework for drum transcription based on self-supervised music representations</p>
+      <p class="hero-lead">Hierarchical drum modeling over frozen music and language backbones—onset, frame, and velocity together.</p>
+      <p class="hero-meta">Weiyang Ding · Yulun Wu · Kai Zhang · et al.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#cases">Listen to cases</a>
+        <a class="btn btn-ghost" href="https://github.com/hanguang9527/Hi-Drum" target="_blank" rel="noopener">Code on GitHub</a>
       </div>
+    </section>
 
-      <div class="col-sm-12 small-padding">
-        <p class='text-justify'>
-          <b>Abstract</b>: As a critical sub-task of Automatic Music Transcription (AMT), Automatic Drum Transcription
-          (ADT) remains challenging. The difficulty stems from the inherent characteristics of percussive sound sources:
-          drum sounds, unlike melodic instruments (e.g. violins and guitars), exhibit transient, broadband energy
-          distributions and lack well-defined harmonic series, hindering the extraction of symbolic representations from
-          music audio. Moreover, existing ADT methods often overlook the contextual dependencies of musical
-          performances, failing to capture pattern consistency within musical sections and the evolution of fill
-          passages between them.
-          To address these limitations, we propose Hi-Drum, a novel paradigm combining a self-supervised music
-          understanding model and a Large Language Model (LLM), integrated with a Hierarchical Drum Module (HDM). The
-          HDM adopts a three-branch parallel architecture to explicitly model coarse-to-fine features, which effectively
-          captures both local variations and global similarities. To further explore the critical roles of dynamics and
-          timing, we design a multi-task fine-tuning strategy incorporating three core components of symbolic
-          representations: onset, velocity, and frame detection.
-          Extensive experiments on multiple open-source datasets demonstrate that Hi-Drum achieves state-of-the-art
-          performance.
+    <section class="section reveal" id="abstract">
+      <p class="section-label">Abstract</p>
+      <h2>Transient drums, structured grooves</h2>
+      <div class="prose">
+        <p>
+          Automatic drum transcription remains difficult because percussive sounds are transient, broadband, and weakly harmonic.
+          Existing methods also underuse section-level pattern consistency and the evolution of fills between sections.
+          Hi-Drum combines a self-supervised music encoder and a language-model decoder with a Hierarchical Drum Module (HDM):
+          three parallel branches for frame-level detail, bar-scale context, and longer-range structure, plus joint onset, frame, and velocity prediction.
         </p>
-
-        <div class="text-center" style="margin-top: 30px; margin-bottom: 30px;">
-          <img src="picture/pipline.png" alt="Overall model architecture"
-            style="width: 100%; max-width: 1000px; height: auto;">
-          <p style="margin-top: 10px; font-style: italic;">Overall model architecture. The encoder extracts general
-            music representations from the audio signal. Then it undergoes multi-scale feature aggregation through the
-            three-branch HDM. Next, sequence modeling is performed by the Qwen decoder. Finally, the drum score
-            prediction is generated through the multi-task fine-tuning module.</p>
-        </div>
-
-      </div>
-
-    </div>
-
-    <div class="container no-gutter small-padding" id="arr_demo">
-      <div class="col-lg-12 text-center">
-        <p class="h1">
-          <hr class="primary">
+        <p>
+          Experiments on Groove and E-GMD—including component ablations, twelve encoder–decoder pairs, and instrument/case analyses—support the framework.
+          On E-GMD, Hi-Drum reaches 92.75% Note F1 and 87.87% velocity-aware Note F1.
         </p>
       </div>
-      <p class="h3">Case Study</p>
-      <p class='text-justify'>In this section, we present case studies across diverse genres and BPMs to demonstrate
-        Hi-Drum's robustness. By integrating a Hierarchical Drum Module (HDM) with an LLM, Hi-Drum captures
-        coarse-to-fine rhythmic features. Comparisons with Ground Truth and OaF Drums highlight its superior ability to
-        model local variations and global structural consistency in complex scenarios.
-      </p>
+    </section>
 
-      <p class='text-justify'></p>
-      <p class="h4"><b style="color:#6c06c0;">[Demo-01]</b></p>
-      <ul>
-        <li><b>Genre:</b> Jazz</li>
-        <li><b>BPM:</b> 120</li>
-      </ul>
-      <div class="tabs">
-        <div class="tabby-tab">
-          <input type="radio" id="tab-1-1" name="tab-1" checked>
-          <label for="tab-1-1">Ground Truth</label>
-          <div class="tabby-content">
-            <midi-visualizer src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.mid" id="demo_1_gt-visualizer">
-            </midi-visualizer>
-            <midi-player src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.mid" visualizer="#demo_1_gt-visualizer"
-              id="demo_1_gt-player">
-            </midi-player>
-            <audio id="demo_1_gt-audio">
-              <source src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.mp3" type="audio/mpeg">
-              <source src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.wav" type="audio/wav">
-              <source src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.flac" type="audio/flac">
-              Your browser does not support the audio tag.
-            </audio>
-          </div>
-        </div>
+    <section class="section reveal" id="architecture">
+      <p class="section-label">Architecture</p>
+      <h2>From audio to drum events</h2>
+      <figure class="arch">
+        <img src="picture/pipline.png" alt="Hi-Drum overall model architecture">
+        <figcaption>
+          MERT features pass through three HDM branches and a Qwen decoder; a multi-task head predicts onset, frame, and velocity.
+        </figcaption>
+      </figure>
+    </section>
 
-        <div class="tabby-tab">
-          <input type="radio" id="tab-1-2" name="tab-1">
-          <label for="tab-1-2">Hi-Drum</label>
-          <div class="tabby-content">
-            <midi-visualizer src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.mid" id="demo_1_hidrum-visualizer">
-            </midi-visualizer>
-            <midi-player src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.mid" visualizer="#demo_1_hidrum-visualizer"
-              id="demo_1_hidrum-player">
-            </midi-player>
-            <audio id="demo_1_hidrum-audio">
-              <source src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.mp3" type="audio/mpeg">
-              <source src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.wav" type="audio/wav">
-              <source src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.flac" type="audio/flac">
-              Your browser does not support the audio tag.
-            </audio>
-          </div>
-        </div>
-
-        <div class="tabby-tab">
-          <input type="radio" id="tab-1-3" name="tab-1">
-          <label for="tab-1-3">OaF Drums</label>
-          <div class="tabby-content">
-            <midi-visualizer src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.mid" id="demo_1_oaf-visualizer">
-            </midi-visualizer>
-            <midi-player src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.mid" visualizer="#demo_1_oaf-visualizer"
-              id="demo_1_oaf-player">
-            </midi-player>
-            <audio id="demo_1_oaf-audio">
-              <source src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.mp3" type="audio/mpeg">
-              <source src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.wav" type="audio/wav">
-              <source src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.flac" type="audio/flac">
-              Your browser does not support the audio tag.
-            </audio>
-          </div>
-        </div>
+    <section class="section reveal" id="cases">
+      <p class="section-label">Case Study</p>
+      <h2>Compare Ground Truth, Hi-Drum, and OaF Drums</h2>
+      <div class="prose">
+        <p>
+          Switch tabs to inspect piano-roll transcriptions and play aligned audio. Cases span jazz and gospel grooves at 120 BPM.
+        </p>
       </div>
 
-
-      <p class='text-justify'></p>
-      <p class="h4"><b style="color:#6c06c0;">[Demo-02]</b></p>
-      <ul>
-        <li><b>Genre:</b> Jazz</li>
-        <li><b>BPM:</b> 120</li>
-      </ul>
-      <div class="tabs">
-        <div class="tabby-tab">
-          <input type="radio" id="tab-2-1" name="tab-2" checked>
-          <label for="tab-2-1">Ground Truth</label>
-          <div class="tabby-content">
-            <midi-visualizer src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.mid" id="demo_2_gt-visualizer">
-            </midi-visualizer>
-            <midi-player src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.mid" visualizer="#demo_2_gt-visualizer"
-              id="demo_2_gt-player">
-            </midi-player>
-            <audio id="demo_2_gt-audio">
-              <source src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.mp3" type="audio/mpeg">
-              <source src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.wav" type="audio/wav">
-              <source src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.flac" type="audio/flac">
-              Your browser does not support the audio tag.
-            </audio>
+      <article class="case">
+        <div class="case-head">
+          <h3 class="case-id">Demo 01</h3>
+          <ul class="case-meta">
+            <li>Jazz</li>
+            <li>120 BPM</li>
+          </ul>
+        </div>
+        <div class="tabs">
+          <div class="tabby-tab">
+            <input type="radio" id="tab-1-1" name="tab-1" checked>
+            <label for="tab-1-1">Ground Truth</label>
+            <div class="tabby-content">
+              <midi-visualizer src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.mid" id="demo_1_gt-visualizer"></midi-visualizer>
+              <midi-player src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.mid" visualizer="#demo_1_gt-visualizer" id="demo_1_gt-player"></midi-player>
+              <audio id="demo_1_gt-audio">
+                <source src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.mp3" type="audio/mpeg">
+                <source src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.wav" type="audio/wav">
+                <source src="demo/15_jazz_120_beat_4-4_11/Ground_Truth.flac" type="audio/flac">
+              </audio>
+            </div>
+          </div>
+          <div class="tabby-tab">
+            <input type="radio" id="tab-1-2" name="tab-1">
+            <label for="tab-1-2">Hi-Drum</label>
+            <div class="tabby-content">
+              <midi-visualizer src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.mid" id="demo_1_hidrum-visualizer"></midi-visualizer>
+              <midi-player src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.mid" visualizer="#demo_1_hidrum-visualizer" id="demo_1_hidrum-player"></midi-player>
+              <audio id="demo_1_hidrum-audio">
+                <source src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.mp3" type="audio/mpeg">
+                <source src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.wav" type="audio/wav">
+                <source src="demo/15_jazz_120_beat_4-4_11/Hi-Drum.flac" type="audio/flac">
+              </audio>
+            </div>
+          </div>
+          <div class="tabby-tab">
+            <input type="radio" id="tab-1-3" name="tab-1">
+            <label for="tab-1-3">OaF Drums</label>
+            <div class="tabby-content">
+              <midi-visualizer src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.mid" id="demo_1_oaf-visualizer"></midi-visualizer>
+              <midi-player src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.mid" visualizer="#demo_1_oaf-visualizer" id="demo_1_oaf-player"></midi-player>
+              <audio id="demo_1_oaf-audio">
+                <source src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.mp3" type="audio/mpeg">
+                <source src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.wav" type="audio/wav">
+                <source src="demo/15_jazz_120_beat_4-4_11/OaF_Drums.flac" type="audio/flac">
+              </audio>
+            </div>
           </div>
         </div>
+      </article>
 
-        <div class="tabby-tab">
-          <input type="radio" id="tab-2-2" name="tab-2">
-          <label for="tab-2-2">Hi-Drum</label>
-          <div class="tabby-content">
-            <midi-visualizer src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.mid" id="demo_2_hidrum-visualizer">
-            </midi-visualizer>
-            <midi-player src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.mid" visualizer="#demo_2_hidrum-visualizer"
-              id="demo_2_hidrum-player">
-            </midi-player>
-            <audio id="demo_2_hidrum-audio">
-              <source src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.mp3" type="audio/mpeg">
-              <source src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.wav" type="audio/wav">
-              <source src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.flac" type="audio/flac">
-              Your browser does not support the audio tag.
-            </audio>
+      <article class="case">
+        <div class="case-head">
+          <h3 class="case-id">Demo 02</h3>
+          <ul class="case-meta">
+            <li>Jazz</li>
+            <li>120 BPM</li>
+          </ul>
+        </div>
+        <div class="tabs">
+          <div class="tabby-tab">
+            <input type="radio" id="tab-2-1" name="tab-2" checked>
+            <label for="tab-2-1">Ground Truth</label>
+            <div class="tabby-content">
+              <midi-visualizer src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.mid" id="demo_2_gt-visualizer"></midi-visualizer>
+              <midi-player src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.mid" visualizer="#demo_2_gt-visualizer" id="demo_2_gt-player"></midi-player>
+              <audio id="demo_2_gt-audio">
+                <source src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.mp3" type="audio/mpeg">
+                <source src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.wav" type="audio/wav">
+                <source src="demo/39_jazz_120_beat_4-4_13/Ground_Truth.flac" type="audio/flac">
+              </audio>
+            </div>
+          </div>
+          <div class="tabby-tab">
+            <input type="radio" id="tab-2-2" name="tab-2">
+            <label for="tab-2-2">Hi-Drum</label>
+            <div class="tabby-content">
+              <midi-visualizer src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.mid" id="demo_2_hidrum-visualizer"></midi-visualizer>
+              <midi-player src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.mid" visualizer="#demo_2_hidrum-visualizer" id="demo_2_hidrum-player"></midi-player>
+              <audio id="demo_2_hidrum-audio">
+                <source src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.mp3" type="audio/mpeg">
+                <source src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.wav" type="audio/wav">
+                <source src="demo/39_jazz_120_beat_4-4_13/Hi-Drum.flac" type="audio/flac">
+              </audio>
+            </div>
+          </div>
+          <div class="tabby-tab">
+            <input type="radio" id="tab-2-3" name="tab-2">
+            <label for="tab-2-3">OaF Drums</label>
+            <div class="tabby-content">
+              <midi-visualizer src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.mid" id="demo_2_oaf-visualizer"></midi-visualizer>
+              <midi-player src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.mid" visualizer="#demo_2_oaf-visualizer" id="demo_2_oaf-player"></midi-player>
+              <audio id="demo_2_oaf-audio">
+                <source src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.mp3" type="audio/mpeg">
+                <source src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.wav" type="audio/wav">
+                <source src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.flac" type="audio/flac">
+              </audio>
+            </div>
           </div>
         </div>
+      </article>
 
-        <div class="tabby-tab">
-          <input type="radio" id="tab-2-3" name="tab-2">
-          <label for="tab-2-3">OaF Drums</label>
-          <div class="tabby-content">
-            <midi-visualizer src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.mid" id="demo_2_oaf-visualizer">
-            </midi-visualizer>
-            <midi-player src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.mid" visualizer="#demo_2_oaf-visualizer"
-              id="demo_2_oaf-player">
-            </midi-player>
-            <audio id="demo_2_oaf-audio">
-              <source src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.mp3" type="audio/mpeg">
-              <source src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.wav" type="audio/wav">
-              <source src="demo/39_jazz_120_beat_4-4_13/OaF_Drums.flac" type="audio/flac">
-              Your browser does not support the audio tag.
-            </audio>
+      <article class="case">
+        <div class="case-head">
+          <h3 class="case-id">Demo 03</h3>
+          <ul class="case-meta">
+            <li>Gospel</li>
+            <li>120 BPM</li>
+          </ul>
+        </div>
+        <div class="tabs">
+          <div class="tabby-tab">
+            <input type="radio" id="tab-3-1" name="tab-3" checked>
+            <label for="tab-3-1">Ground Truth</label>
+            <div class="tabby-content">
+              <midi-visualizer src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.mid" id="demo_3_gt-visualizer"></midi-visualizer>
+              <midi-player src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.mid" visualizer="#demo_3_gt-visualizer" id="demo_3_gt-player"></midi-player>
+              <audio id="demo_3_gt-audio">
+                <source src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.mp3" type="audio/mpeg">
+                <source src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.wav" type="audio/wav">
+                <source src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.flac" type="audio/flac">
+              </audio>
+            </div>
+          </div>
+          <div class="tabby-tab">
+            <input type="radio" id="tab-3-2" name="tab-3">
+            <label for="tab-3-2">Hi-Drum</label>
+            <div class="tabby-content">
+              <midi-visualizer src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.mid" id="demo_3_hidrum-visualizer"></midi-visualizer>
+              <midi-player src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.mid" visualizer="#demo_3_hidrum-visualizer" id="demo_3_hidrum-player"></midi-player>
+              <audio id="demo_3_hidrum-audio">
+                <source src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.mp3" type="audio/mpeg">
+                <source src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.wav" type="audio/wav">
+                <source src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.flac" type="audio/flac">
+              </audio>
+            </div>
+          </div>
+          <div class="tabby-tab">
+            <input type="radio" id="tab-3-3" name="tab-3">
+            <label for="tab-3-3">OaF Drums</label>
+            <div class="tabby-content">
+              <midi-visualizer src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.mid" id="demo_3_oaf-visualizer"></midi-visualizer>
+              <midi-player src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.mid" visualizer="#demo_3_oaf-visualizer" id="demo_3_oaf-player"></midi-player>
+              <audio id="demo_3_oaf-audio">
+                <source src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.mp3" type="audio/mpeg">
+                <source src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.wav" type="audio/wav">
+                <source src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.flac" type="audio/flac">
+              </audio>
+            </div>
           </div>
         </div>
-      </div>
+      </article>
+    </section>
+  </main>
 
+  <footer class="site-footer">
+    <p>
+      Built for the Hi-Drum project.
+      MIDI visualization via
+      <a href="https://cifkao.github.io/html-midi-player/" target="_blank" rel="noopener">html-midi-player</a>;
+      audio rendered with Kontakt Factory Library 2 / BandLab.
+    </p>
+  </footer>
 
-      <p class='text-justify'></p>
-      <p class="h4"><b style="color:#6c06c0;">[Demo-03]</b> </p>
-      <ul>
-        <li><b>Genre:</b> Gospel</li>
-        <li><b>BPM:</b> 120</li>
-      </ul>
-      <div class="tabs">
-        <div class="tabby-tab">
-          <input type="radio" id="tab-3-1" name="tab-3" checked>
-          <label for="tab-3-1">Ground Truth</label>
-          <div class="tabby-content">
-            <midi-visualizer src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.mid" id="demo_3_gt-visualizer">
-            </midi-visualizer>
-            <midi-player src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.mid" visualizer="#demo_3_gt-visualizer"
-              id="demo_3_gt-player">
-            </midi-player>
-            <audio id="demo_3_gt-audio">
-              <source src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.mp3" type="audio/mpeg">
-              <source src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.wav" type="audio/wav">
-              <source src="demo/142_gospel_120_beat_4-4_36/Ground_Truth.flac" type="audio/flac">
-              Your browser does not support the audio tag.
-            </audio>
-          </div>
-        </div>
-
-        <div class="tabby-tab">
-          <input type="radio" id="tab-3-2" name="tab-3">
-          <label for="tab-3-2">Hi-Drum</label>
-          <div class="tabby-content">
-            <midi-visualizer src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.mid" id="demo_3_hidrum-visualizer">
-            </midi-visualizer>
-            <midi-player src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.mid" visualizer="#demo_3_hidrum-visualizer"
-              id="demo_3_hidrum-player">
-            </midi-player>
-            <audio id="demo_3_hidrum-audio">
-              <source src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.mp3" type="audio/mpeg">
-              <source src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.wav" type="audio/wav">
-              <source src="demo/142_gospel_120_beat_4-4_36/Hi-Drum.flac" type="audio/flac">
-              Your browser does not support the audio tag.
-            </audio>
-          </div>
-        </div>
-
-        <div class="tabby-tab">
-          <input type="radio" id="tab-3-3" name="tab-3">
-          <label for="tab-3-3">OaF Drums</label>
-          <div class="tabby-content">
-            <midi-visualizer src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.mid" id="demo_3_oaf-visualizer">
-            </midi-visualizer>
-            <midi-player src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.mid" visualizer="#demo_3_oaf-visualizer"
-              id="demo_3_oaf-player">
-            </midi-player>
-            <audio id="demo_3_oaf-audio">
-              <source src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.mp3" type="audio/mpeg">
-              <source src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.wav" type="audio/wav">
-              <source src="demo/142_gospel_120_beat_4-4_36/OaF_Drums.flac" type="audio/flac">
-              Your browser does not support the audio tag.
-            </audio>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-
-
-
-    <div class="container no-gutter small-padding">
-      <p class="h1">
-        <hr class="primary">
-      </p>
-      <h5>This site leverages <a href="https://volny.github.io/creative-theme-jekyll/" target="_blank">the jekyll
-          template</a> and uses <a href="https://cifkao.github.io/html-midi-player/"
-          target="_blank">html-midi-player</a> for MIDI visiualization and <a
-          href="https://www.native-instruments.com/ni-tech-manuals/kontakt-factory-library-manual/en/welcome-to-the-kontakt-factory-library-2"
-          target="_blank">Kontakt Factory Library 2</a>/<a href="https://www.bandlab.com/" target="_blank">BandLab</a>
-        for MIDI-to-audio synthesis.</h5>
-    </div>
-
-  </section>
-
-  <!-- jQuery -->
-  <script src="js/jquery.js"></script>
-
-  <!-- Bootstrap Core JavaScript -->
-  <script src="js/bootstrap.min.js"></script>
-
-  <!-- Plugin JavaScript -->
-  <script src="js/jquery.easing.min.js"></script>
-  <script src="js/jquery.fittext.js"></script>
-  <script src="js/wow.min.js"></script>
-
-  <!-- Custom Theme JavaScript -->
-  <script src="js/creative.js"></script>
-
-
-  <script
-    src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.4.0"></script>
-
+  <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.4.0"></script>
   <script>
-
-    var i_vis;
-    var visualizers = document.getElementsByTagName("midi-visualizer")
-    for (i_vis = 0; i_vis < visualizers.length; i_vis++) {
-      visualizers[i_vis].config = {
-        noteHeight: 8,
-        pixelsPerTimeStep: 60,
-        minPitch: 35,
-        maxPitch: 60,
-      };
-    }
-
-
-    async function onDomReady() {
-      const players = document.getElementsByTagName('midi-player');
-      const audios = document.getElementsByTagName('audio');
-
-      for (let i = 0; i < players.length; i++) {
-        const player = players[i];
-        const audio = audios[i]
-
-        player.addEventListener('load', function () {
-          const SeekBar = player.shadowRoot.querySelector('.seek-bar');
-          SeekBar.addEventListener('input', function () {
-            audio.pause();
-          });
-          SeekBar.addEventListener('change', function () {
-            audio.currentTime = player.currentTime;
-            if (player.playing) {
-              const playPromise = audio.play();
-              if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                  console.log("Audio play prevented or failed (likely missing file):", error);
-                });
-              }
-            }
-          });
-        })
-        player.addEventListener('start', function () {
-          audio.currentTime = player.currentTime;
-          const playPromise = audio.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(error => {
-              console.log("Audio play prevented or failed (likely missing file):", error);
-            });
-          }
-        });
-        player.addEventListener('stop', function () {
-          audio.pause();
-        });
+    (function () {
+      var visualizers = document.getElementsByTagName("midi-visualizer");
+      for (var i = 0; i < visualizers.length; i++) {
+        visualizers[i].config = {
+          noteHeight: 8,
+          pixelsPerTimeStep: 60,
+          minPitch: 35,
+          maxPitch: 60
+        };
       }
-    }
-    document.addEventListener("DOMContentLoaded", onDomReady, false);
 
+      function onDomReady() {
+        var players = document.getElementsByTagName("midi-player");
+        var audios = document.getElementsByTagName("audio");
+        for (var i = 0; i < players.length; i++) {
+          (function (player, audio) {
+            player.addEventListener("load", function () {
+              var SeekBar = player.shadowRoot && player.shadowRoot.querySelector(".seek-bar");
+              if (!SeekBar) return;
+              SeekBar.addEventListener("input", function () { audio.pause(); });
+              SeekBar.addEventListener("change", function () {
+                audio.currentTime = player.currentTime;
+                if (player.playing) {
+                  var playPromise = audio.play();
+                  if (playPromise) playPromise.catch(function () {});
+                }
+              });
+            });
+            player.addEventListener("start", function () {
+              audio.currentTime = player.currentTime;
+              var playPromise = audio.play();
+              if (playPromise) playPromise.catch(function () {});
+            });
+            player.addEventListener("stop", function () { audio.pause(); });
+          })(players[i], audios[i]);
+        }
+      }
+      document.addEventListener("DOMContentLoaded", onDomReady);
 
-
+      if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) entry.target.classList.add("is-in");
+          });
+        }, { threshold: 0.12 });
+        document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+      } else {
+        document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("is-in"); });
+      }
+    })();
   </script>
 </body>
-
 </html>
