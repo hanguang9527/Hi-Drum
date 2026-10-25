@@ -13,7 +13,7 @@ from .adapter import Adapter
 
 
 def _debug_report(hypothesis_id, location, msg, data, run_id='pre-fix'):
-    # Why: 训练在 GPU 前向阶段 OOM，必须把关键运行时状态发到会话日志里，避免继续凭猜测改配置或模型。
+    # Why: on GPU OOM during forward, dump runtime state to logs instead of guessing configs.
     env_path = '.dbg/qwen-train-oom.env'
     server_url = 'http://127.0.0.1:7777/event'
     session_id = 'qwen-train-oom'
@@ -161,8 +161,7 @@ class LLMDecoder(nn.Module):
         
         # Analysis layer selection parameters
         self.selected_layers = self._parse_layer_selection(layer_selection)
-        # Why: 这里的 layer_selection 专属于 decoder 层融合，必须与 encoder 层选择解耦，
-        # 否则四块结构虽然物理分开，配置流向仍然是耦合的。
+        # Why: decoder layer_selection must stay decoupled from the encoder layer choice.
         
         # Load model
         self._load_model()

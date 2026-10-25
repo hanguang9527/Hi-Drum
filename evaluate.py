@@ -56,8 +56,7 @@ def parse_model_params_from_path(path):
     enable_branch2 = True
     enable_branch3 = True
 
-    # Why: 自定义 logdir（例如 smoke test / 手工命名目录）不一定把模型结构编码进路径名；
-    # 优先读取训练时保存的 config.json，才能保证评测/转录重建出的结构与真实 checkpoint 一致。
+    # Why: custom logdirs may not encode architecture in the path; prefer training config.json for exact rebuild.
     try:
         config = load_saved_config_from_model_file(path)
         if config is not None:
@@ -177,7 +176,7 @@ def load_model_from_checkpoint(model_file, device):
             model_complexity=model_complexity,
             encoder_model=encoder_model,
             encoder_layer_selection=encoder_layer,
-            # Why: 评测端也必须复用 decoder 的独立层选择，否则重建模型时会和训练时的结构不一致。
+            # Why: evaluation must reuse the decoder layer-selection used at training time.
             decoder_layer_selection=decoder_layer,
             decoder_model=decoder_model,
             decoder_freeze_model=decoder_freeze_model,
@@ -701,8 +700,7 @@ def main(model_file, dataset, dataset_group, save_path=None, batch_size=8,
                 )
                 batch_size = 1
 
-            # Why: 当前评测逻辑在提取 notes/frame 指标时会直接 squeeze 第 0 维，
-            # 尚未实现真正的多样本后处理，因此这里显式固定为 batch_size=1，避免参数表意与实际行为不一致。
+            # Why: metric extraction currently squeezes dim 0; force batch_size=1 until true multi-sample postprocess exists.
             # Why: eval is batch_size=1 and often CPU/decode bound; prefetch with workers
             # to keep the GPU fed when packing multiple eval processes per card.
             loader = DataLoader(

@@ -184,8 +184,7 @@ def transcribe(model, audio, saved_config=None, use_saved_config=False):
         device = next(model.parameters()).device
         audio = audio.to(device)
 
-        # Why: 训练侧是按“当前片段长度”做归一化；推理若先按整首音频长度归一化再切段，
-        # 同一局部片段在长/短音频中的幅值会不同，造成训推输入分布失配。
+        # Why: training normalizes per segment; normalizing the full clip before chunking mismatches train/infer scale.
         audio = audio.float().div_(len(audio) / 10)
         
         #Add batch dimension: [sequence_length] -> [1, sequence_length]

@@ -58,9 +58,7 @@ class PianoRollAudioDataset(Dataset):
             for input_files in tqdm(self.files(group), desc=f'Loading group {group}'):
                 # callloadmethod processes the file and returns the result (HDF5file path) added to the data list
                 self.data.append(self.load(*input_files))
-        # Why: 训练按固定 sequence_length 切段后直接 stack。短于该长度的音频切片更短，
-        # 一个 batch 里长度不一致就会在 collate 崩掉。这里在建索引时丢掉它们，5 秒协议下
-        # 现有片段都够长，行为不变；10 秒实验才会真正滤掉大约一成。
+        # Why: training stacks fixed-length slices; drop shorter clips at index time to avoid collate length mismatch.
         self._drop_clips_shorter_than_sequence()
         # Why: grouped multi-kit training needs to reuse the same cached HDF5 sample
         # lengths across many synchronized reads; memoizing avoids repeated metadata I/O.
@@ -105,14 +103,12 @@ class PianoRollAudioDataset(Dataset):
                 begin = step_begin * HOP_LENGTH
                 end = begin + self.sequence_length
 
-            # Why: 统一在这里做一次切片读取，避免前面先读进 result、后面又重复从 HDF5
-            # 取同一段数据，减少一次无意义的 I/O 和中间数组创建。
+            # Why: read the slice once here to avoid duplicate HDF5 I/O and temporary arrays.
             audio_data = data['audio'][begin:end]
             label_data = data['label'][step_begin:step_end, :]
             velocity_data = data['velocity'][step_begin:step_end, :]
 
-            # Why: 当 sequence_length=None 时，数据集语义是“读取完整音频”；
-            # 这里改用实际片段长度做归一化，避免 None / 10 直接崩溃，同时保持和推理侧按片段长度归一化的行为一致。
+            # Why: sequence_length=None means full clip; normalize by actual length (matches inference).
             normalization_length = self.sequence_length if self.sequence_length is not None else len(audio_data)
             result['audio'] = torch.tensor(audio_data, dtype=torch.float32).div_(normalization_length / 10)
             
@@ -121,7 +117,7 @@ class PianoRollAudioDataset(Dataset):
             
             # GPUOptimization: Batch calculation of all tag types
             result['onset'] = (result['label'] == 3).float()
-            # result['offset'] = (result['label'] == 1).float()  # 当前模型已移除对offset（音符结束时间）的预测和Loss计算（因为drum鼓不需要计算offset），将其注释掉以节省CPU计算和内存开销。
+            # Offset labels unused: drums omit offset prediction/loss.
             result['frame'] = (result['label'] > 1).float()
 
             # Downsampling (currently commented out, uncommented if required)
@@ -246,8 +242,7 @@ class PianoRollAudioDataset(Dataset):
             if (len(tsv_path) > 0):
                 # fromTSVFile loadingMIDIevent data (onsettime、offsettime、pitch、intensity)
                 midi = np.loadtxt(tsv_path, delimiter='\t', skiprows=1)  # skiprows=1skip header
-                # Why: np.loadtxt 在单条事件标签上会返回一维数组；统一升成二维后，
-                # 下面的事件循环就不会因为“单行 tsv”而解包崩溃。
+                # Why: np.loadtxt returns 1-D for a single event row; promote to 2-D before unpacking.
                 if midi.size == 0:
                     midi = np.empty((0, 4))
                 else:

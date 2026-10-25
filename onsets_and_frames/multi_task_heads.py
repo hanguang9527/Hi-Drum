@@ -73,8 +73,7 @@ class PostDecoderProcessor(nn.Module):
         frame_input_dim = decoder_output_dim
         velocity_input_dim = decoder_output_dim
         if self.head_mode == self.HEAD_MODE_PAPER_HIERARCHICAL:
-            # Why: 论文设定里 onset branch 要辅助 frame/velocity，
-            # 这里通过拼接 onset 概率显式把这种层级关系落到 heads 结构里。
+            # Why: paper setting conditions frame/velocity on onset by concatenating onset probabilities.
             frame_input_dim += output_dim
             velocity_input_dim += output_dim
 
@@ -110,8 +109,7 @@ class PostDecoderProcessor(nn.Module):
         frame_input = x
         velocity_input = x
         if self.head_mode == self.HEAD_MODE_PAPER_HIERARCHICAL:
-            # Why: 使用 onset 概率作为下游条件信号，能在保留端到端训练的同时，
-            # 明确区分“论文层级绑定”与“完全独立三头”两种实验模式。
+            # Why: onset probabilities as conditioning separate hierarchical vs independent head modes.
             onset_condition = torch.sigmoid(onset_pred)
             frame_input = torch.cat([frame_input, onset_condition], dim=-1)
             velocity_input = torch.cat([velocity_input, onset_condition], dim=-1)

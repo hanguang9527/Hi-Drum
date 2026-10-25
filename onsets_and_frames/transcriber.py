@@ -186,8 +186,7 @@ class OnsetsAndFrames(nn.Module):
             decoder_model=decoder_model,
             encoder_model=encoder_model,
             feature_dim=self._get_encoder_feature_dim(encoder_model),
-            # Why: encoder 和 decoder 是两块独立模块，decoder 的层选择必须走独立配置，
-            # 否则消融实验会出现“日志改了但真实网络没改”的情况。
+            # Why: encoder/decoder are separate; decoder layer selection must use its own config.
             layer_selection=decoder_layer_selection,
             freeze_model=decoder_freeze_model,
             device=device,
@@ -245,13 +244,11 @@ class OnsetsAndFrames(nn.Module):
         Args:
             feature_dim: decoderOutput feature dimensions
         """
-        # Why: 第二阶段开始后，multi-task heads 已经拥有独立文件与独立职责；
-        # transcriber 这里只保留“装配”角色，不再持有 head 的实现细节。
+        # Why: heads live in their own module; transcriber only wires them together.
         self.multi_task_heads: MultiTaskHeads = MLPBranchFactory.create_post_decoder_processor(
             decoder_output_dim=feature_dim, 
             output_dim=self.output_features,
-            # Why: heads 现在只保留“论文层级绑定”和“完全独立”两种模式，
-            # 便于和 adapter 一样做清晰的对比消融实验。
+            # Why: only hierarchical vs independent head modes remain for clean ablations.
             head_mode=self.head_mode,
         )
 

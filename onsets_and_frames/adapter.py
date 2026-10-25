@@ -38,7 +38,7 @@ class DilatedConv1DBlock(nn.Module):
                     dilation=dilation,
                     padding=self._get_padding(kernel_size, dilation)  # Keep time dimension
                 ),
-                # Why: 空洞卷积分支感受野大、不同 dilation 的统计分布差异明显，先做归一化更利于稳定训练。
+                # Why: dilated branches have large RFs and divergent stats; normalize before fusion for stable training.
                 nn.BatchNorm1d(out_channels),
                 nn.ReLU()
             ) for dilation in dilations
@@ -48,9 +48,9 @@ class DilatedConv1DBlock(nn.Module):
         # Modification: The input dimension becomes out_channels * len(dilations), since we now use concatenation instead of summation
         self.concat_norm = nn.BatchNorm1d(out_channels * len(dilations))
         self.output_projection = nn.Linear(out_channels * len(dilations), out_channels)
-        # Why: 分支输出在融合前先做尺度对齐，避免仅因数值幅度不同导致融合权重学偏。
+        # Why: align branch scales before fusion so weights are not dominated by magnitude alone.
         self.output_norm = nn.LayerNorm(out_channels)
-        # Why: 这里加轻量 shortcut 不是因为网络太深，而是为了保留原始时序信息，降低大核空洞卷积对输入分布的破坏。
+        # Why: light shortcut keeps raw temporal cues and reduces distribution shift from large dilated kernels.
         self.residual_projection = (
             nn.Conv1d(in_channels, out_channels, kernel_size=1)
             if in_channels != out_channels else nn.Identity()
@@ -173,7 +173,7 @@ class TransformerBlock(nn.Module):
     def forward(self, x):
         # Project to the target dimension first
         x = self.input_projection(x)  # [batch, time, output_dim]
-        # Why: 先对投影后的特征做标准化，便于与另外两个卷积分支在融合前保持更接近的输出尺度。
+        # Why: standardize projected features so scales stay comparable to the other conv branches.
         x = self.input_norm(x)
         
         for attn, ff in self.layers:
@@ -209,9 +209,9 @@ class ParallelConvBranch(nn.Module):
         self.bn2 = nn.BatchNorm1d(out_channels)
         # Result fused projection layer
         self.projection = nn.Linear(out_channels * 2, out_channels)
-        # Why: 融合后的输出在进入总融合前先做标准化，减少不同分支数值尺度不一致的问题。
+        # Why: standardize fused branch outputs before the final mix to reduce scale mismatch.
         self.output_norm = nn.LayerNorm(out_channels)
-        # Why: 这里保留一条轻量残差通路，让浅层卷积分支在学习局部模式的同时不丢掉原始时间结构。
+        # Why: keep a light residual path so local conv features retain original temporal structure.
         self.residual_projection = (
             nn.Conv1d(in_channels, out_channels, kernel_size=1)
             if in_channels != out_channels else nn.Identity()
@@ -384,8 +384,7 @@ class Adapter(nn.Module):
             # Direct passthrough (Direct Connection)
             # Note: The premise is input_dim == output_dim
             if self.input_dim != self.output_dim:
-                 # Why: 0-branch 直连模式只服务于“特定 encoder/decoder 天然对齐”的消融实验；
-                 # 一旦维度不对齐就必须立刻报错，避免把实验配置错误误当成普通前向逻辑继续跑下去。
+                 # Why: 0-branch identity is only for matched encoder/decoder ablations; raise if dims disagree.
                  raise ValueError(
                      f"0-branch direct mode requires aligned dimensions, but got "
                      f"input_dim={self.input_dim} and output_dim={self.output_dim}."

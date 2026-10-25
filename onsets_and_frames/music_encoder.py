@@ -337,8 +337,7 @@ class MusicEncoder(nn.Module):
             x = x * (x.shape[-1] / 10.0) / 32768.0
 
         model_trainable = any(p.requires_grad for p in self.model.parameters())
-        # Why: 当底层 encoder 冻结时，只关闭“模型前向”本身的梯度，避免无谓保留计算图；
-        # 但层融合权重仍需在 no_grad 外计算，否则 layer_weights 也会被一起锁死。
+        # Why: if the encoder is frozen, stop grads on the backbone forward but keep layer_weights trainable.
         model_forward_context = nullcontext() if model_trainable else torch.no_grad()
 
         if self.model_type == "musicfm":

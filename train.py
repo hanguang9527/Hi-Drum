@@ -58,7 +58,7 @@ from onsets_and_frames.distributed import (
     is_main_process,
 )
 
-ex = Experiment('train_transcriber', save_git_info=False)  # 禁用Git信息收集，防止因未追踪文件过多导致sacred在执行repo.is_dirty()时卡死
+ex = Experiment('train_transcriber', save_git_info=False)  # Disable git probing; large untracked trees make Sacred repo.is_dirty() hang
 
 
 @ex.config
@@ -137,8 +137,8 @@ def config():
     enable_branch3 = True  # Whether to enable the Transformer branch (Transformer)
 
     # 🎯 Multi-task heads configuration
-    # - "independent": onset/frame/velocity 三分支完全独立
-    # - "paper_hierarchical": 共享 global conv，且 onset 显式辅助 frame 和 velocity
+    # - "independent": fully separate onset/frame/velocity heads
+    # - "paper_hierarchical": shared global conv; onset conditions frame and velocity
     head_mode = 'paper_hierarchical'
 
     # 🎯 Multi-task loss weights (onset : frame : velocity)
@@ -370,7 +370,7 @@ def train(logdir, device, iterations, resume_iteration, resume_from, checkpoint_
             total_batch_size=batch_size,
         )
         # Train-time val always includes Groove validation. E-GMD val default on
-        # (validation_include_egmd=True). See 训期验证集协议.md.
+        # (validation_include_egmd=True).
         validation_datasets = [
             Groove(path=dataset_path, groups=validation_groups, sequence_length=validation_length),
         ]
@@ -418,7 +418,7 @@ def train(logdir, device, iterations, resume_iteration, resume_from, checkpoint_
             MAX_MIDI - MIN_MIDI + 1, model_complexity,
             encoder_model=encoder_model,
             encoder_layer_selection=encoder_layer_selection,
-            # Why: decoder 必须接收自己的层选择配置，确保 encoder/decoder 两块独立消融。
+            # Why: decoder must use its own layer-selection config so encoder/decoder ablations stay independent.
             decoder_layer_selection=decoder_layer_selection,
             decoder_model=decoder_model,
             decoder_freeze_model=decoder_freeze_model,
@@ -526,7 +526,7 @@ def train(logdir, device, iterations, resume_iteration, resume_from, checkpoint_
 
     if is_main_process(rank):
         summary(unwrap_model(model))
-    # Why: last_epoch=0 会让 StepLR 误以为在恢复 scheduler，要求 optimizer 里已有 initial_lr。
+    # Why: last_epoch=0 makes StepLR think it is resuming and requires initial_lr on the optimizer.
     # When scheduler state is restored below, last_epoch is only a placeholder.
     # When rebuilding after an LR change, last_epoch aligns StepLR with the resumed step.
     if restore_scheduler_state is None:
@@ -689,8 +689,7 @@ def train(logdir, device, iterations, resume_iteration, resume_from, checkpoint_
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         if clip_gradient_norm:
-            # Why: 梯度裁剪必须发生在参数更新之前，否则本次 step 仍然使用未裁剪梯度，
-            # 配置项 clip_gradient_norm 就不会真正影响训练稳定性。
+            # Why: clip gradients before the optimizer step; otherwise clip_gradient_norm has no effect.
             clip_grad_norm_(model.parameters(), clip_gradient_norm)
 
         optimizer.step()
@@ -765,8 +764,7 @@ def train(logdir, device, iterations, resume_iteration, resume_from, checkpoint_
                     #Save the layer weights of the optimal model
                     save_layer_weights(model, i, is_best=True)
 
-                # Why: 当前项目以 note F1 作为主指标；保留 frame F1 仅用于记录“best note 时的伴随表现”，
-                # 不再单独维护一套 best frame checkpoint，避免保存逻辑和选模标准分裂。
+                # Why: note F1 is the primary selection metric; frame F1 is logged with the best-note checkpoint only.
                 with open(os.path.join(logdir, 'best_note_f1.txt'), 'w') as f:
                     f.write(f"Best Note F1: {best_note_f1:.4f} | Frame F1: {best_note_f1_frame_f1:.4f} | Step: {best_note_f1_step}\n")
                 
