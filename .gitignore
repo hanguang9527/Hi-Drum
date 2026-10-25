@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.env
+
+# Training / evaluation outputs (do not publish)
+runs/
+logs/
+results/
+demo_train_output/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+events.out.tfevents.*
+
+# Local pretrained backbones & datasets (download separately)
+model/**
+!model/README.md
+data/
+datasets/
+*.h5
+*.hdf5
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.dbg/
+
+# Misc
+*.bak
+*.log
+.ipynb_checkpoints/
